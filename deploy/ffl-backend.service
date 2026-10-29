@@ -1,0 +1,20 @@
+[Unit]
+Description=Hainan fare monitor backend
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=ffl
+Group=ffl
+WorkingDirectory=/opt/ffl
+EnvironmentFile=/opt/ffl/.env
+ExecStart=/usr/bin/java -jar /opt/ffl/ffl-monitor.jar
+Restart=on-failure
+RestartSec=10
+SuccessExitStatus=143
+
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

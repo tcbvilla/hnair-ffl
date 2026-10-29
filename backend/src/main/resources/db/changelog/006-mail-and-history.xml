@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="006-user-smtp" author="ffl">
+        <addColumn tableName="users">
+            <column name="smtp_host" type="VARCHAR(200)"/>
+            <column name="smtp_port" type="INT"/>
+            <column name="smtp_username" type="VARCHAR(200)"/>
+            <column name="smtp_password" type="VARCHAR(200)"/>
+            <column name="smtp_ssl" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="006-monitor-alerts" author="ffl">
+        <addColumn tableName="monitors">
+            <column name="notify_presence" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="notify_quantity" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inventory_state" type="VARCHAR(2000)"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="006-monitor-events" author="ffl">
+        <createTable tableName="monitor_events">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="monitor_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="initial_record" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="presence_changed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="quantity_changed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="detail" type="VARCHAR(1000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint baseTableName="monitor_events" baseColumnNames="monitor_id"
+                                 constraintName="fk_events_monitor" referencedTableName="monitors"
+                                 referencedColumnNames="id"/>
+        <createIndex tableName="monitor_events" indexName="idx_events_monitor">
+            <column name="monitor_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
