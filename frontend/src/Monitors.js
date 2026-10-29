@@ -301,6 +301,7 @@ function resultLines(item) {
     return [{ text: item.lastError || '查询失败' }];
   }
   const summary = item.lastSummary || '';
+  const missed = /^未命中目标价\d+，/.test(summary);
   const body = summary.replace(/^未命中目标价\d+，/, '');
   if (!body || body === '无航班' || body === '无此航班') {
     return [{ empty: true, text: body || '无航班' }];
@@ -308,10 +309,11 @@ function resultLines(item) {
   return body.split('；').filter(Boolean).map((part) => {
     const matched = part.trim().match(/^(?:HU)?(\d+)\s+(\d{2}:\d{2}-\d{2}:\d{2})\s+¥(\d+)\s+余([0-9A]+)$/);
     if (!matched) {
-      return { raw: part.trim(), text: part.trim() };
+      return { empty: missed, raw: part.trim(), text: part.trim() };
     }
     return {
-      stock: matched[4],
+      empty: missed,
+      stock: missed ? undefined : matched[4],
       text: `${matched[1]} ${matched[2]} ¥${matched[3]}`
     };
   });

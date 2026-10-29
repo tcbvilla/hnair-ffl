@@ -187,19 +187,19 @@ public class MonitorService {
         } else {
             monitor.setLastSummary(trim("未命中目标价" + targetPrice + "，" + summarize(cheapest(scoped)), 500));
         }
-        MailJob job = recordStock(monitor, scoped);
+        MailJob job = recordStock(monitor, scoped, targetPrice);
         log.info("Monitor {} checked hit={} summary={}", monitor.getId(), monitor.getLastHit(), monitor.getLastSummary());
         return job;
     }
 
-    private MailJob recordStock(Monitor monitor, List<FlightQuote> scoped) {
+    private MailJob recordStock(Monitor monitor, List<FlightQuote> scoped, int targetPrice) {
         Map<String, String> current = new TreeMap<>();
         for (FlightQuote quote : scoped) {
             String key = digits(quote.flightNo());
             if (key.isBlank()) {
                 continue;
             }
-            String token = stockToken(quote.inventory());
+            String token = priceEquals(quote.price(), targetPrice) ? stockToken(quote.inventory()) : "";
             String existing = current.get(key);
             if (existing == null || existing.isEmpty()) {
                 current.put(key, token);
